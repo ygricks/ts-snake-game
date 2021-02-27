@@ -2,6 +2,9 @@ import { Display } from './display';
 import { FoodFactory, SnakeFactory } from './factories';
 import { Game } from './game';
 
+const DISPLAY_HEIGHT = 25;
+const DISPLAY_WIDTH = 25;
+
 class GameModal {
   private $window: HTMLElement;
   private _isOpened: boolean;
@@ -47,17 +50,69 @@ class GameModal {
       this._isOpened = true;
     }
   }
+}
 
+class App {
+  private game: Game;
+  private modal: GameModal;
+
+  constructor(game: Game, modal: GameModal, ) {
+    this.game = game;
+    this.modal = modal;
+  }
+
+  closeModal() {
+    const { modal, game } = this;
+    modal.close();
+    if (game.isFinished()) {
+      game.reset();
+    } else if (!game.isRunning()) {
+      game.exec('play');
+    }
+  }
+
+  userInput(eventCode: string) {
+    switch (eventCode) {
+      case 'ArrowUp':
+      case 'KeyW':
+        this.game.exec('changeDirection', 'top');
+        break;
+      case 'ArrowDown':
+      case 'KeyS':
+        this.game.exec('changeDirection', 'bottom');
+        break;
+      case 'ArrowLeft':
+      case 'KeyA':
+        this.game.exec('changeDirection', 'left');
+        break;
+      case 'ArrowRight':
+      case 'KeyD':
+        this.game.exec('changeDirection', 'right');
+        break;
+      case 'Space':
+        if (this.modal.isOpened()) {
+          this.closeModal();
+        } else {
+          if (this.game.isRunning()) {
+            this.game.exec('pause');
+            this.modal.resume();
+          } else {
+            this.game.exec('play');
+          }
+        }
+        break;
+    }
+  }
 }
 
 function createGame($canvas: HTMLCanvasElement): Game {
-  const display = new Display($canvas.getContext('2d'), 20);
+  const display = new Display($canvas.getContext('2d'), $canvas.width / DISPLAY_WIDTH);
 
   const snakeFactory = new SnakeFactory([
     {x: 2, y: 12}, {x: 1, y: 12}, {x: 0, y: 12}
   ], {dx: 1, dy: 0}, 256);
 
-  const foodFactory = new FoodFactory(25, 25, 5);
+  const foodFactory = new FoodFactory(DISPLAY_HEIGHT, DISPLAY_WIDTH, 5);
 
   const game = new Game(display, snakeFactory, foodFactory, {
     colors: {
@@ -71,6 +126,7 @@ function createGame($canvas: HTMLCanvasElement): Game {
   return game;
 }
 
+
 function main() {
   const $closeModal = document.querySelector('.close-modal');
   const $bestScore = document.querySelectorAll('.game-best-score span');
@@ -83,6 +139,7 @@ function main() {
 
   const $canvas = document.getElementById('display') as HTMLCanvasElement;
   const game = createGame($canvas);
+  const app = new App(game, modal);
   game
   .on('scoreUpdated', function(score: number) {
     const strScore = score.toString();
@@ -106,43 +163,24 @@ function main() {
   })
   ;
 
-  document.addEventListener('keypress', function(event: KeyboardEvent) {
-    switch (event.code) {
-      case 'KeyW':
-        game.exec('changeDirection', 'top');
-        break;
-      case 'KeyS':
-        game.exec('changeDirection', 'bottom');
-        break;
-      case 'KeyA':
-        game.exec('changeDirection', 'left');
-        break;
-      case 'KeyD':
-        game.exec('changeDirection', 'right');
-        break;
-      case 'Space':
-        if (modal.isOpened()) {
-          $closeModal.dispatchEvent(new Event('click'));
-        } else {
-          if (game.isRunning()) {
-            game.exec('pause');
-            modal.resume();
-          } else {
-            game.exec('play');
-          }
-        }
-        break;
+  document.addEventListener('keydown', function(event: KeyboardEvent) {
+    app.userInput(event.code);
+  })
+  ;
+
+  document.querySelector('.control-butons').addEventListener('click', function(event) {
+    if (!game.isFinished()) {
+      if (game.isRunning()) {
+        app.userInput(event.target.dataset.dir);
+      } else {
+        app.userInput('Space');
+      }
     }
   })
   ;
 
   $closeModal.addEventListener('click', function() {
-    modal.close();
-    if (game.isFinished()) {
-      game.reset();
-    } else if (!game.isRunning()) {
-      game.exec('play');
-    }
+    app.closeModal();
   });
 }
 

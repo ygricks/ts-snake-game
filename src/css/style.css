@@ -1,3 +1,8 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
 body {
   background-color: black;
 }
@@ -14,12 +19,40 @@ body {
   position: relative;
   margin: 0 auto;
   padding: 20px;
-  width: 500px;
+  width: 300px;
   background-color: #4a752c;
   color: #ffffff;
   font-family: arial, sans serif;
   font-size: 24px;
   font-weight: bold;
+}
+
+canvas {
+  outline: 1px solid #fff;
+  height: 300px;
+  width: 300px;
+}
+
+@media (min-width: 320px) {
+  .game {
+    width: calc(100vw - 40px);
+  }
+
+  canvas {
+    height: calc(100vw - 40px);
+    width: calc(100vw - 40px);
+  }
+}
+
+@media (min-width: 500px) {
+  .game {
+    width: 500px;
+  }
+
+  canvas {
+    width: 500px;
+    height: 500px;
+  }
 }
 
 .game-header {
@@ -41,13 +74,53 @@ body {
 .game-header .game-best-score span {
   color: #ffffff;
 }
+/* -------------------------------------------------------------------------- */
 
-canvas {
-  height: 500px;
-  width: 500px;
-  outline: 1px solid #fff;
+.control-butons {
+  display: flex;
+  flex-wrap: wrap;
+  width: 180px;
+  height: 180px;
+  margin: 20px auto;
+  transform: rotate(45deg);
+  border-radius: 50%;
+  overflow: hidden;
 }
 
+.control-butons > button {
+  display: inline-block;
+  width: 50%;
+  height: 50%;
+  background-color: #c8aa0d;
+  border: none;
+  border: 2px solid #4a752c;
+  cursor: pointer;
+}
+
+.control-butons > button,
+.control-butons > button:focus,
+.control-butons > button:active {
+  box-shadow: none;
+  outline: none;
+}
+
+[data-dir="ArrowUp"] img {
+  transform: rotate(-45deg);
+}
+
+[data-dir="ArrowRight"] img {
+  transform: rotate(45deg);
+}
+
+[data-dir="ArrowDown"] img {
+  transform: rotate(135deg);
+}
+
+[data-dir="ArrowLeft"] img {
+  transform: rotate(-135deg);
+}
+
+/* -------------------------------------------------------------------------- */
 .game-modal {
   position: absolute;
   top: 0;
@@ -59,13 +132,13 @@ canvas {
 }
 
 .game-modal {
-  opacity: 0;
+  display: none;
 }
 
 .game-modal.modal-instructions,
 .game-modal.modal-game-over,
 .game-modal.modal-resume {
-  opacity: 1
+  display: block;
 }
 
 .game-modal-body {

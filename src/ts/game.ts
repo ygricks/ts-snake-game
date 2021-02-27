@@ -83,6 +83,7 @@ export class Game {
         if (this.isRunning()) {
           this._requestDirection.push( DIRECTIONS[args[0]] );
         }
+        break;
     }
   }
 

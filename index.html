@@ -1,7 +1,9 @@
 <html>
   <head>
-    <title>Snake game!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./dist/css/style.css" />
+    <title>Snake game!</title >
   </head>
   <body>
     <div class="game">
@@ -9,16 +11,27 @@
         <div class="game-score">Score: <span>0</span></div>
         <div class="game-best-score invisible">Best: <span>0</span></div>
       </div>
-      <canvas id="display" height="500" width="500"></canvas>
+      <canvas id="display" height="300" width="300"></canvas>
+      <div class="control-butons">
+        <button data-dir="ArrowUp">
+          <img src="./dist/arrow-up.svg" alt="Up" />
+        </button>
+        <button data-dir="ArrowRight">
+          <img src="./dist/arrow-up.svg" alt="Up" />
+        </button>
+        <button data-dir="ArrowLeft">
+          <img src="./dist/arrow-up.svg" alt="Up" />
+        </button>
+        <button data-dir="ArrowDown">
+          <img src="./dist/arrow-up.svg" alt="Up" />
+        </button>
+      </div>
       <div class="game-modal modal-instructions">
         <div class="game-modal-body">
           <div class="game-instructions">
-            <p>Use <span style="color:#ea4335">Space</span> to start / stop game.</p>
+            <p>Use <img src="./dist/space.png" alt="Space key" /> to start / stop game.</p>
             <p>Use
-              <span style="color:#4285f4">A</span>
-              <span style="color:#34a853">S</span>
-              <span style="color:#ea4335">D</span>
-              <span style="color:#fbbc05">W</span>
+              <img src="./dist/arrows.png" alt="Arrows" />
               to control the snake.
             </p>
           </div>
