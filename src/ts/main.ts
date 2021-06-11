@@ -126,6 +126,19 @@ function createGame($canvas: HTMLCanvasElement): Game {
   return game;
 }
 
+function buttonClick(event: Event, app: App, game: Game) {
+  if (!game.isFinished()) {
+    let input;
+    if (game.isRunning()) {
+      const target = event.target;
+      input = target.dataset.dir || target.parentElement.dataset.dir;
+    } else {
+      input = 'Space';
+    }
+    console.log(input);
+    app.userInput(input);
+  }
+}
 
 function main() {
   const $closeModal = document.querySelector('.close-modal');
@@ -168,16 +181,8 @@ function main() {
   })
   ;
 
-  document.querySelector('.control-butons').addEventListener('click', function(event) {
-    if (!game.isFinished()) {
-      if (game.isRunning()) {
-        app.userInput(event.target.dataset.dir);
-      } else {
-        app.userInput('Space');
-      }
-    }
-  })
-  ;
+  // document.querySelector('.control-butons').addEventListener('touchstart', (event) => { buttonClick(event, app, game); });
+  document.querySelector('.control-butons').addEventListener('click', (event) => { buttonClick(event, app, game); });
 
   $closeModal.addEventListener('click', function() {
     app.closeModal();
