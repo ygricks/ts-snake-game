@@ -25,6 +25,7 @@ body {
   font-family: arial, sans serif;
   font-size: 24px;
   font-weight: bold;
+  text-align: center;
 }
 
 canvas {
@@ -76,48 +77,36 @@ canvas {
 }
 /* -------------------------------------------------------------------------- */
 
-.control-butons {
-  display: flex;
-  flex-wrap: wrap;
-  width: 180px;
-  height: 180px;
-  margin: 20px auto;
-  transform: rotate(45deg);
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-.control-butons > button {
+.control-buttons {
+  position: relative;
   display: inline-block;
-  width: 50%;
-  height: 50%;
-  background-color: #c8aa0d;
-  border: none;
-  border: 2px solid #4a752c;
-  cursor: pointer;
+  width: 200px;
+  height: 200px;
+  margin: 20px auto;
+  border-radius: 50%;
+  background-color: #aaaaaa80;
+  background-image: url('../control.png');
+  background-size: 100%;
 }
 
-.control-butons > button,
-.control-butons > button:focus,
-.control-butons > button:active {
-  box-shadow: none;
-  outline: none;
+.control-button {
+  position: absolute;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background-color: #c2c2c2;
+  left: 85px;
+  top: 85px;
 }
 
-[data-dir="ArrowUp"] img {
-  transform: rotate(-45deg);
+.free-control .control-button {
+  left: 85px !important;
+  top: 85px !important;
+  animation: left 0.2s, top 0.2s;
 }
 
-[data-dir="ArrowRight"] img {
-  transform: rotate(45deg);
-}
-
-[data-dir="ArrowDown"] img {
-  transform: rotate(135deg);
-}
-
-[data-dir="ArrowLeft"] img {
-  transform: rotate(-135deg);
+.user-control .control-button {
+  animation: none;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -1,6 +1,7 @@
 import { Display } from './display';
 import { FoodFactory, SnakeFactory } from './factories';
 import { Game } from './game';
+import { UserMControler } from './UserMControler';
 
 const DISPLAY_HEIGHT = 25;
 const DISPLAY_WIDTH = 25;
@@ -73,18 +74,22 @@ class App {
 
   userInput(eventCode: string) {
     switch (eventCode) {
+      case 'Top':
       case 'ArrowUp':
       case 'KeyW':
         this.game.exec('changeDirection', 'top');
         break;
+      case 'Bottom':
       case 'ArrowDown':
       case 'KeyS':
         this.game.exec('changeDirection', 'bottom');
         break;
+      case 'Left':
       case 'ArrowLeft':
       case 'KeyA':
         this.game.exec('changeDirection', 'left');
         break;
+      case 'Right':
       case 'ArrowRight':
       case 'KeyD':
         this.game.exec('changeDirection', 'right');
@@ -126,20 +131,6 @@ function createGame($canvas: HTMLCanvasElement): Game {
   return game;
 }
 
-function buttonClick(event: Event, app: App, game: Game) {
-  if (!game.isFinished()) {
-    let input;
-    if (game.isRunning()) {
-      const target = event.target;
-      input = target.dataset.dir || target.parentElement.dataset.dir;
-    } else {
-      input = 'Space';
-    }
-    console.log(input);
-    app.userInput(input);
-  }
-}
-
 function main() {
   const $closeModal = document.querySelector('.close-modal');
   const $bestScore = document.querySelectorAll('.game-best-score span');
@@ -176,16 +167,23 @@ function main() {
   })
   ;
 
+  $closeModal.addEventListener('click', function() {
+    app.closeModal();
+  });
+
   document.addEventListener('keydown', function(event: KeyboardEvent) {
     app.userInput(event.code);
   })
   ;
 
-  // document.querySelector('.control-butons').addEventListener('touchstart', (event) => { buttonClick(event, app, game); });
-  document.querySelector('.control-butons').addEventListener('click', (event) => { buttonClick(event, app, game); });
-
-  $closeModal.addEventListener('click', function() {
-    app.closeModal();
+  const control = new UserMControler('control-buttons', 'free-control');
+  control.onChange((n: string, o: string) => {
+    if (!game.isFinished() && n) {
+      if (!game.isRunning()) {
+        app.userInput('Space');
+      }
+      app.userInput(n);
+    }
   });
 }
 
