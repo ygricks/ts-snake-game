@@ -37,3 +37,17 @@ export interface IFoodFactory {
 export interface ISnakeFactory {
   getSnake(): ISnake;
 }
+
+export interface VibrationPatterns {
+  eatFood: number[];
+  changeDirection: number[];
+  gameOver: number[];
+}
+
+export interface IGameVibration {
+  toggleSound(): boolean;
+  eatFood(): void;
+  changeDirection(): void;
+  gameOver(): void;
+  setPatterns(patterns: VibrationPatterns): void;
+}

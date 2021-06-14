@@ -1,10 +1,17 @@
 import { Display } from './display';
 import { FoodFactory, SnakeFactory } from './factories';
 import { Game } from './game';
+import { GameVibration } from './GameVibration';
 import { UserMControler } from './UserMControler';
 
 const DISPLAY_HEIGHT = 25;
 const DISPLAY_WIDTH = 25;
+
+const VIBRATION_PATTERN = {
+  eatFood: [100],
+  changeDirection: [50],
+  gameOver: [250, 100, 250],
+};
 
 class GameModal {
   private $window: HTMLElement;
@@ -110,7 +117,7 @@ class App {
   }
 }
 
-function createGame($canvas: HTMLCanvasElement): Game {
+function createGame($canvas: HTMLCanvasElement) {
   const display = new Display($canvas.getContext('2d'), $canvas.width / DISPLAY_WIDTH);
 
   const snakeFactory = new SnakeFactory([
@@ -118,8 +125,8 @@ function createGame($canvas: HTMLCanvasElement): Game {
   ], {dx: 1, dy: 0}, 256);
 
   const foodFactory = new FoodFactory(DISPLAY_HEIGHT, DISPLAY_WIDTH, 5);
-
-  const game = new Game(display, snakeFactory, foodFactory, {
+  const vibrations = new GameVibration(VIBRATION_PATTERN);
+  const game = new Game(display, snakeFactory, foodFactory, vibrations, {
     colors: {
       snakeHead: '#1c469d',
       snake: '#4875eb',
@@ -128,7 +135,7 @@ function createGame($canvas: HTMLCanvasElement): Game {
     displayHasWall: true,
   });
 
-  return game;
+  return {game, vibrations};
 }
 
 function main() {
@@ -136,13 +143,14 @@ function main() {
   const $bestScore = document.querySelectorAll('.game-best-score span');
   const $bestScoreWrapper = document.querySelectorAll('.game-best-score');
   const $gameScore = document.querySelectorAll('.game-score span');
+  const $gameSound = document.querySelector('.game-sound');
 
   const modal = new GameModal(
     document.querySelector('.game-modal')
   );
 
   const $canvas = document.getElementById('display') as HTMLCanvasElement;
-  const game = createGame($canvas);
+  const {game, vibrations} = createGame($canvas);
   const app = new App(game, modal);
   game
   .on('scoreUpdated', function(score: number) {
@@ -183,6 +191,16 @@ function main() {
         app.userInput('Space');
       }
       app.userInput(n);
+    }
+  });
+
+  $gameSound.addEventListener('click', function() {
+    const mutedClass = 'muted';
+    const hasSound = vibrations.toggleSound();
+    if (hasSound) {
+      $gameSound.classList.remove(mutedClass);
+    } else {
+      $gameSound.classList.add(mutedClass);
     }
   });
 }

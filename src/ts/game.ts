@@ -1,5 +1,5 @@
 import {
-  Direction, Food, IDisplay, ISnakeFactory, IFoodFactory, ISnake
+  Direction, Food, IDisplay, ISnakeFactory, IFoodFactory, ISnake, IGameVibration
 } from "./interfaces";
 
 interface Settings {
@@ -24,6 +24,7 @@ export class Game {
   private snakeFactory: ISnakeFactory;
   private foodFactory: IFoodFactory;
   private food: Food;
+  private vibration: IGameVibration;
 
   private _score: number = 0;
   private _bestScore: number = 0;
@@ -36,10 +37,11 @@ export class Game {
 
   private events: {[name: string]: Function[]} = {};
 
-  constructor(display: IDisplay, snakeFactory: ISnakeFactory, foodFactory: IFoodFactory, settings: Settings) {
+  constructor(display: IDisplay, snakeFactory: ISnakeFactory, foodFactory: IFoodFactory, vibration: IGameVibration, settings: Settings) {
     this.display = display;
     this.snakeFactory = snakeFactory;
     this.foodFactory = foodFactory;
+    this.vibration = vibration;
     this._settings = settings;
 
     this.reset();
@@ -134,6 +136,7 @@ export class Game {
         this._bestScore = this._score;
       }
 
+      this.vibration.gameOver();
       this.trigger('gameOver');
       if (hasNewBestScore) {
         this.trigger('bestscoreUpdated', this._bestScore);
@@ -178,20 +181,19 @@ export class Game {
 
   private _update() {
     if (this._requestDirection.length) {
+      this.vibration.changeDirection();
       this.snake.changeDirection(this._requestDirection.shift());
     }
     const nextPixel = this.snake.nextPixel();
     const { snake, food } = this;
     if (nextPixel.x == food.pixel.x && nextPixel.y == food.pixel.y) {
+      this.vibration.eatFood();
       snake.eatFrom(nextPixel);
-      // this.trigger('eatFood');
       this._score += food.energy;
       this.trigger('scoreUpdated', this._score);
       this.food = this.foodFactory.getFood(1);
-      // this.trigger('newFood', this.food);
     } else {
       snake.goTo(nextPixel);
-      // this.trigger('movedTo', this.nextPixel);
     }
   }
 

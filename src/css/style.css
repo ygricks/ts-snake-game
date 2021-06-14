@@ -110,6 +110,47 @@ canvas {
 }
 
 /* -------------------------------------------------------------------------- */
+.game-btn {
+  position: absolute;
+  width: calc(100% - 40px);
+  padding: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.game-btn button {
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+  background-color: #aaaaaa80;
+  background-size: 60%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.game-btn button,
+.game-btn button:hover,
+.game-btn button:active,
+.game-btn button:focus {
+  outline: 0;
+  border: 0;
+}
+
+.game-sound {
+  background-image: url('../unmuted.svg');
+}
+
+.game-sound.muted {
+  background-image: url('../muted.svg');
+}
+
+.game-control {
+  background-image: url('../play.svg');
+}
+
+.game-control.playing {
+  background-image: url('../stop.svg');
+}
+/* -------------------------------------------------------------------------- */
 .game-modal {
   position: absolute;
   top: 0;
