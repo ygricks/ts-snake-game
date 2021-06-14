@@ -1,3 +1,5 @@
+import { isMobile } from 'is-mobile';
+
 interface MovePosition {
   x: number;
   y: number;
@@ -117,32 +119,39 @@ export class UserMControler {
   private listen() {
     const self = this;
 
-    self.container.addEventListener('touchstart', function(event: MouseEvent) {
-      self.userControl(true);
-      self.moveControl(event);
-    });
-    self.container.addEventListener('mousedown', function(event: MouseEvent) {
-      self.userControl(true);
-      self.moveControl(event);
-    });
+    if (isMobile()) {
+      self.container.addEventListener('touchstart', function(event: MouseEvent) {
+        self.userControl(true);
+        self.moveControl(event);
+      });
 
-    self.container.addEventListener('touchend', function(event: MouseEvent) {
-      self.userControl(false);
-    });
-    self.container.addEventListener('mouseup', function(event: MouseEvent) {
-      self.userControl(false);
-    });
+      self.container.addEventListener('touchend', function(event: MouseEvent) {
+        self.userControl(false);
+      });
 
-    self.container.addEventListener('touchmove', function(event: MouseEvent) {
-      self.moveControl(event);
-    });
-    self.container.addEventListener('mousemove', function(event: MouseEvent) {
-      self.moveControl(event);
-    });
+      self.container.addEventListener('touchmove', function(event: MouseEvent) {
+        self.moveControl(event);
+      });
+    } else {
+      self.container.addEventListener('mousedown', function(event: MouseEvent) {
+        self.userControl(true);
+        self.moveControl(event);
+      });
 
-    self.container.addEventListener('mouseleave', function(event: MouseEvent) {
-      self.userControl(false);
-    });
+      self.container.addEventListener('mouseup', function(event: MouseEvent) {
+        self.userControl(false);
+      });
+
+      self.container.addEventListener('mousemove', function(event: MouseEvent) {
+        if (self.lastDir) {
+          self.moveControl(event);
+        }
+      });
+
+      self.container.addEventListener('mouseleave', function(event: MouseEvent) {
+        self.userControl(false);
+      });
+    }
   }
 
   private triggerDirChange(newDir: string, oldDir: string) {
