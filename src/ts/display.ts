@@ -1,4 +1,4 @@
-import { IDisplay, Pixel } from './interfaces';
+import { IDisplay, ISnake, IDisplayImages, Food, Pixel } from './interfaces';
 
 interface DisplayColors {
   display: string;
@@ -13,18 +13,19 @@ const DEFAULT_DISPLAY_COLORS: DisplayColors = {
 export class Display implements IDisplay {
   private context: CanvasRenderingContext2D;
   private pixelSize: number;
+  private images: IDisplayImages;
   private colors: DisplayColors;
   private _width: number;
   private _height: number;
 
-
-  constructor(context: CanvasRenderingContext2D, pixelSize: number, colors: DisplayColors = DEFAULT_DISPLAY_COLORS) {
+  constructor(context: CanvasRenderingContext2D, pixelSize: number, images: IDisplayImages, colors: DisplayColors = DEFAULT_DISPLAY_COLORS) {
     this.context = context;
     this.pixelSize = pixelSize;
 
     this._width = Math.floor(context.canvas.width / pixelSize);
     this._height = Math.floor(context.canvas.height / pixelSize);
 
+    this.images = images;
     this.colors = colors;
   }
 
@@ -40,6 +41,64 @@ export class Display implements IDisplay {
     pixels.forEach((pixel) => {
       this._drawPixel(color, pixel);
     });
+  }
+
+  public drawSnake(colors: Object, snake: ISnake) {
+    const angleStep = Math.PI / 2;
+    const pixels = snake.pixels;
+    const images = this.images;
+    let px = snake.direction.dx;
+    let py = snake.direction.dy;
+    let image: HTMLImageElement;
+    let angle: number;
+    for (let i = 0; i < pixels.length; i++) {
+      let a = pixels[i];
+      let b = pixels[i + 1];
+      if (i == 0 || i + 1 == pixels.length) {
+        // Head or tail
+        let x: number;
+        let y: number;
+        if (i == 0) {
+          image = images.snakeHead;
+          b = b || a;
+          x = a.x - b.x;
+          y = a.y - b.y;
+        } else {
+          image = images.snakeTail;
+          b = pixels[i - 1];
+          x = b.x - a.x;
+          y = b.y - a.y;
+        }
+        angle = Math.atan2(y, x);
+      } else if (b) {
+        // Body
+        if (px == b.x) {
+          image = images.snakeBody;
+          angle = angleStep;
+        } else if (py == b.y) {
+          image = images.snakeBody;
+          angle = 0;
+        } else {
+          // Body corner
+          image = images.snakeBodyCorner;
+          const ax = px - a.x;
+          const ay = py - a.y;
+          const bx = b.x - a.x;
+          const by = b.y - a.y;
+          angle = Math.atan2(
+            (ay + by) / 2,(ax + bx) / 2
+          ) - Math.PI / 4;
+        }
+      }
+      this._drawPixelImg(image, pixels[i], angle);
+
+      px = a.x;
+      py = a.y;
+    }
+  }
+
+  public drawFood(colors: Object, food: Food) {
+    this._drawPixelImg(this.images.food, food.pixel, 0);
   }
 
   public clear() {
@@ -62,6 +121,18 @@ export class Display implements IDisplay {
         context.fill();
       }
     }
+  }
+
+  private _drawPixelImg(img: HTMLImageElement, pixel: Pixel, angle: number) {
+    const { context } = this;
+    const x = this.pixelSize * pixel.x;
+    const y = this.pixelSize * pixel.y;
+    context.save();
+    context.translate(x + this.pixelSize / 2, y + this.pixelSize / 2);
+    context.rotate(angle);
+    context.translate(-x - this.pixelSize / 2, -y - this.pixelSize / 2);
+    context.drawImage(img, x, y, this.pixelSize, this.pixelSize);
+    context.restore();
   }
 
   private _drawPixel(color: string, pixel: Pixel): void {

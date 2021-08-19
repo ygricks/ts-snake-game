@@ -1,8 +1,8 @@
 import { Display } from './display';
 import { FoodFactory, SnakeFactory } from './factories';
 import { Game } from './game';
-import { GameVibration } from './GameVibration';
-import { UserMControler } from './UserMControler';
+import { GameVibration } from './game-vibration';
+import { UserMControler } from './user-m-controler';
 
 const DISPLAY_HEIGHT = 25;
 const DISPLAY_WIDTH = 25;
@@ -117,25 +117,53 @@ class App {
   }
 }
 
-function createGame($canvas: HTMLCanvasElement) {
-  const display = new Display($canvas.getContext('2d'), $canvas.width / DISPLAY_WIDTH);
-
-  const snakeFactory = new SnakeFactory([
-    {x: 2, y: 12}, {x: 1, y: 12}, {x: 0, y: 12}
-  ], {dx: 1, dy: 0}, 256);
-
-  const foodFactory = new FoodFactory(DISPLAY_HEIGHT, DISPLAY_WIDTH, 5);
-  const vibrations = new GameVibration(VIBRATION_PATTERN);
-  const game = new Game(display, snakeFactory, foodFactory, vibrations, {
-    colors: {
-      snakeHead: '#1c469d',
-      snake: '#4875eb',
-      food: '#e7471d',
-    },
-    displayHasWall: true,
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((response, reject) => {
+    const img = new Image();
+    img.src = src;
+    img.onerror = (err) => {
+      reject(err);
+    };
+    img.onload = () => {
+      response(img);
+    };
   });
+}
 
-  return {game, vibrations};
+function createGame($canvas: HTMLCanvasElement) {
+  return Promise.all([
+    loadImage('./dist/head.png'),
+    loadImage('./dist/left-top.png'),
+    loadImage('./dist/vertical.png'),
+    loadImage('./dist/tail.png'),
+    loadImage('./dist/apple.png')
+  ])
+  .then(([ snakeHead, snakeBodyCorner, snakeBody, snakeTail, food ]) => {
+    const display = new Display($canvas.getContext('2d'), $canvas.width / DISPLAY_WIDTH, {
+      snakeHead, snakeBody, snakeBodyCorner, snakeTail, food
+    });
+
+    const snakeFactory = new SnakeFactory([
+      {x: 2, y: 12}, {x: 1, y: 12}, {x: 0, y: 12}
+    ], {dx: 1, dy: 0}, 256);
+
+    const foodFactory = new FoodFactory(DISPLAY_HEIGHT, DISPLAY_WIDTH, 5);
+    const vibrations = new GameVibration(VIBRATION_PATTERN);
+    const game = new Game(display, snakeFactory, foodFactory, vibrations, {
+      colors: {
+        snakeHead: '#1c469d',
+        snake: '#4875eb',
+        food: '#e7471d',
+      },
+      displayHasWall: true,
+    });
+
+    return {game, vibrations};
+  });
+}
+
+function initEvents() {
+
 }
 
 function main() {
@@ -150,58 +178,64 @@ function main() {
   );
 
   const $canvas = document.getElementById('display') as HTMLCanvasElement;
-  const {game, vibrations} = createGame($canvas);
-  const app = new App(game, modal);
-  game
-  .on('scoreUpdated', function(score: number) {
-    const strScore = score.toString();
-    for (let i = 0; i < $gameScore.length; i++) {
-      $gameScore[i].innerHTML = strScore;
-    }
-  })
-  .on('bestscoreUpdated', function(score: number) {
-    const strScore = score.toString();
-    for (let i = 0; i < $bestScore.length; i++) {
-      $bestScore[i].innerHTML = strScore;
-    }
-    if (score > 0) {
-      for (let i = 0; i < $bestScoreWrapper.length; i++) {
-        $bestScoreWrapper[i].classList.remove('invisible')
+
+  createGame($canvas)
+  .then(({game, vibrations}) => {
+    const app = new App(game, modal);
+    game
+    .on('scoreUpdated', function(score: number) {
+      const strScore = score.toString();
+      for (let i = 0; i < $gameScore.length; i++) {
+        $gameScore[i].innerHTML = strScore;
       }
-    }
-  })
-  .on('gameOver', function() {
-    modal.gameOver();
-  })
-  ;
-
-  $closeModal.addEventListener('click', function() {
-    app.closeModal();
-  });
-
-  document.addEventListener('keydown', function(event: KeyboardEvent) {
-    app.userInput(event.code);
-  })
-  ;
-
-  const control = new UserMControler('control-buttons', 'free-control');
-  control.onChange((n: string, o: string) => {
-    if (!game.isFinished() && n) {
-      if (!game.isRunning()) {
-        app.userInput('Space');
+    })
+    .on('bestscoreUpdated', function(score: number) {
+      const strScore = score.toString();
+      for (let i = 0; i < $bestScore.length; i++) {
+        $bestScore[i].innerHTML = strScore;
       }
-      app.userInput(n);
-    }
-  });
+      if (score > 0) {
+        for (let i = 0; i < $bestScoreWrapper.length; i++) {
+          $bestScoreWrapper[i].classList.remove('invisible')
+        }
+      }
+    })
+    .on('gameOver', function() {
+      modal.gameOver();
+    })
+    ;
 
-  $gameSound.addEventListener('click', function() {
-    const mutedClass = 'muted';
-    const hasSound = vibrations.toggleSound();
-    if (hasSound) {
-      $gameSound.classList.remove(mutedClass);
-    } else {
-      $gameSound.classList.add(mutedClass);
-    }
+    $closeModal.addEventListener('click', function() {
+      app.closeModal();
+    });
+
+    document.addEventListener('keydown', function(event: KeyboardEvent) {
+      app.userInput(event.code);
+    })
+    ;
+
+    const control = new UserMControler('control-buttons', 'free-control');
+    control.onChange((n: string, o: string) => {
+      if (!game.isFinished() && n) {
+        if (!game.isRunning()) {
+          app.userInput('Space');
+        }
+        app.userInput(n);
+      }
+    });
+
+    $gameSound.addEventListener('click', function() {
+      const mutedClass = 'muted';
+      const hasSound = vibrations.toggleSound();
+      if (hasSound) {
+        $gameSound.classList.remove(mutedClass);
+      } else {
+        $gameSound.classList.add(mutedClass);
+      }
+    });
+  })
+  .catch((err) => {
+    console.error(err);
   });
 }
 

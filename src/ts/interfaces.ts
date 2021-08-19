@@ -12,7 +12,17 @@ export interface IDisplay {
   width(): number;
   height(): number;
   drawPixels(color: string, ...pixels: Pixel[]): void;
+  drawSnake(colors: Object, snake: ISnake): void;
+  drawFood(colors: Object, snake: Food): void;
   clear(): void;
+}
+
+export interface IDisplayImages {
+  snakeHead: HTMLImageElement;
+  snakeBodyCorner: HTMLImageElement;
+  snakeBody: HTMLImageElement;
+  snakeTail: HTMLImageElement;
+  food: HTMLImageElement;
 }
 
 export interface ISnake {

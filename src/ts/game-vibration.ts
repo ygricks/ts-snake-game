@@ -9,7 +9,6 @@ export class GameVibration implements IGameVibration {
   }
 
   _vibrate(pattern: number[]) {
-    console.log(pattern.length, this.hasSound);
     if (pattern.length && this.hasSound) {
       window.navigator.vibrate(pattern);
     }

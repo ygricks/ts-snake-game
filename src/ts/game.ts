@@ -201,8 +201,7 @@ export class Game {
     const { display, snake, food } = this;
     const { colors } = this._settings;
     display.clear();
-    display.drawPixels(colors.snakeHead, snake.pixels[0]);
-    display.drawPixels(colors.snake, ...snake.pixels.slice(1));
-    display.drawPixels(colors.food, food.pixel);
+    display.drawSnake(colors, snake);
+    display.drawFood(colors, food);
   }
 }
