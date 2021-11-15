@@ -23,7 +23,7 @@ export class Game {
   private snake: ISnake;
   private snakeFactory: ISnakeFactory;
   private foodFactory: IFoodFactory;
-  private food: Food;
+  private food: Food[];
   private vibration: IGameVibration;
 
   private _score: number = 0;
@@ -61,7 +61,7 @@ export class Game {
 
   public reset() {
     this.snake = this.snakeFactory.getSnake();
-    this.food = this.foodFactory.getFood();
+    this._genFood();
     this._finished = false;
     if (this._score != 0) {
       this._score = 0;
@@ -186,12 +186,19 @@ export class Game {
     }
     const nextPixel = this.snake.nextPixel();
     const { snake, food } = this;
-    if (nextPixel.x == food.pixel.x && nextPixel.y == food.pixel.y) {
+    let foodToEat: Food;
+    for (let i = 0; i < food.length; i++) {
+      if (nextPixel.x == food[i].pixel.x && nextPixel.y == food[i].pixel.y) {
+        foodToEat = food[i];
+        break;
+      }
+    }
+    if (foodToEat) {
       this.vibration.eatFood();
       snake.eatFrom(nextPixel);
-      this._score += food.energy;
+      this._score += foodToEat.energy;
       this.trigger('scoreUpdated', this._score);
-      this.food = this.foodFactory.getFood();
+      this._genFood();
     } else {
       snake.goTo(nextPixel);
     }
@@ -201,6 +208,17 @@ export class Game {
     const { display, snake, food } = this;
     display.clear();
     display.drawSnake(snake);
-    display.drawFood(food);
+    for (let i = 0; i < food.length; i++) {
+      display.drawFood(food[i]);
+    }
+  }
+
+  private _genFood() {
+    this.food = [];
+    for (let i = 0; i < 3; i++) {
+      this.food.push(
+        this.foodFactory.getFood()
+      );
+    }
   }
 }
