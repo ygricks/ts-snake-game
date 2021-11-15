@@ -138,25 +138,25 @@ function createGame($canvas: HTMLCanvasElement) {
     loadImage('./dist/tail.png'),
     loadImage('./dist/apple.png'),
     loadImage('./dist/orange.png'),
-    loadImage('./dist/pear.png'),
+    loadImage('./dist/plum.png'),
     loadImage('./dist/mushroom1.png'),
     loadImage('./dist/mushroom2.png'),
     loadImage('./dist/mushroom3.png'),
   ])
   .then(([
     snakeHead, snakeBodyCorner, snakeBody, snakeTail,
-    apple, orange, pear, mushroom1, mushroom2, mushroom3]) => {
+    apple, orange, plum, mushroom1, mushroom2, mushroom3]) => {
     const images = {
       snakeHead,
       snakeBody,
       snakeBodyCorner,
       snakeTail,
       food: {
-        apple, orange, pear, mushroom1, mushroom2, mushroom3,
+        apple, orange, plum, mushroom1, mushroom2, mushroom3,
       }
     };
     const foodName = [
-      "pear", "apple", "orange", "mushroom1", "mushroom2", "mushroom3",
+      "plum", "apple", "orange", "mushroom1", "mushroom2", "mushroom3",
     ];
     const foodEnergy = [1, 2, 3, -1, -1, -1];
     const display = new Display(
