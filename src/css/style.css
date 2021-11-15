@@ -201,6 +201,7 @@ canvas {
   outline: none;
   border: none;
   border-radius: 12px;
+  cursor: pointer;
 }
 
 .close-modal .b-play,

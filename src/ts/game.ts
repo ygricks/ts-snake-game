@@ -61,7 +61,7 @@ export class Game {
 
   public reset() {
     this.snake = this.snakeFactory.getSnake();
-    this.food = this.foodFactory.getFood(1);
+    this.food = this.foodFactory.getFood();
     this._finished = false;
     if (this._score != 0) {
       this._score = 0;
@@ -191,7 +191,7 @@ export class Game {
       snake.eatFrom(nextPixel);
       this._score += food.energy;
       this.trigger('scoreUpdated', this._score);
-      this.food = this.foodFactory.getFood(1);
+      this.food = this.foodFactory.getFood();
     } else {
       snake.goTo(nextPixel);
     }
@@ -199,9 +199,8 @@ export class Game {
 
   private _draw() {
     const { display, snake, food } = this;
-    const { colors } = this._settings;
     display.clear();
-    display.drawSnake(colors, snake);
-    display.drawFood(colors, food);
+    display.drawSnake(snake);
+    display.drawFood(food);
   }
 }

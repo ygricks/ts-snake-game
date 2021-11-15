@@ -136,18 +136,40 @@ function createGame($canvas: HTMLCanvasElement) {
     loadImage('./dist/left-top.png'),
     loadImage('./dist/vertical.png'),
     loadImage('./dist/tail.png'),
-    loadImage('./dist/apple.png')
+    loadImage('./dist/apple.png'),
+    loadImage('./dist/orange.png'),
+    loadImage('./dist/pear.png'),
+    loadImage('./dist/mushroom1.png'),
+    loadImage('./dist/mushroom2.png'),
+    loadImage('./dist/mushroom3.png'),
   ])
-  .then(([ snakeHead, snakeBodyCorner, snakeBody, snakeTail, food ]) => {
-    const display = new Display($canvas.getContext('2d'), $canvas.width / DISPLAY_WIDTH, {
-      snakeHead, snakeBody, snakeBodyCorner, snakeTail, food
-    });
+  .then(([
+    snakeHead, snakeBodyCorner, snakeBody, snakeTail,
+    apple, orange, pear, mushroom1, mushroom2, mushroom3]) => {
+    const images = {
+      snakeHead,
+      snakeBody,
+      snakeBodyCorner,
+      snakeTail,
+      food: {
+        apple, orange, pear, mushroom1, mushroom2, mushroom3,
+      }
+    };
+    const foodName = [
+      "pear", "apple", "orange", "mushroom1", "mushroom2", "mushroom3",
+    ];
+    const foodEnergy = [1, 2, 3, -1, -1, -1];
+    const display = new Display(
+      $canvas.getContext('2d'), $canvas.width / DISPLAY_WIDTH, images
+    );
 
     const snakeFactory = new SnakeFactory([
       {x: 2, y: 12}, {x: 1, y: 12}, {x: 0, y: 12}
     ], {dx: 1, dy: 0}, 256);
 
-    const foodFactory = new FoodFactory(DISPLAY_HEIGHT, DISPLAY_WIDTH, 5);
+    const foodFactory = new FoodFactory(
+      DISPLAY_HEIGHT, DISPLAY_WIDTH, foodName, foodEnergy
+    );
     const vibrations = new GameVibration(VIBRATION_PATTERN);
     const game = new Game(display, snakeFactory, foodFactory, vibrations, {
       colors: {

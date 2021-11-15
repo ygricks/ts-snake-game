@@ -12,8 +12,8 @@ export interface IDisplay {
   width(): number;
   height(): number;
   drawPixels(color: string, ...pixels: Pixel[]): void;
-  drawSnake(colors: Object, snake: ISnake): void;
-  drawFood(colors: Object, snake: Food): void;
+  drawSnake(snake: ISnake): void;
+  drawFood(food: Food): void;
   clear(): void;
 }
 
@@ -22,7 +22,9 @@ export interface IDisplayImages {
   snakeBodyCorner: HTMLImageElement;
   snakeBody: HTMLImageElement;
   snakeTail: HTMLImageElement;
-  food: HTMLImageElement;
+  food: {
+    [key: string]: HTMLImageElement;
+  };
 }
 
 export interface ISnake {
@@ -36,12 +38,13 @@ export interface ISnake {
 }
 
 export interface Food {
+  name: string;
   pixel: Pixel;
   energy: number;
 }
 
 export interface IFoodFactory {
-  getFood(energy: number): Food;
+  getFood(): Food;
 }
 
 export interface ISnakeFactory {

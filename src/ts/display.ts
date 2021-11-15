@@ -43,7 +43,7 @@ export class Display implements IDisplay {
     });
   }
 
-  public drawSnake(colors: Object, snake: ISnake) {
+  public drawSnake(snake: ISnake) {
     const angleStep = Math.PI / 2;
     const pixels = snake.pixels;
     const images = this.images;
@@ -97,8 +97,8 @@ export class Display implements IDisplay {
     }
   }
 
-  public drawFood(colors: Object, food: Food) {
-    this._drawPixelImg(this.images.food, food.pixel, 0);
+  public drawFood(food: Food) {
+    this._drawPixelImg(this.images.food[food.name], food.pixel, 0);
   }
 
   public clear() {

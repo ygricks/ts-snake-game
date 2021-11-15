@@ -8,24 +8,29 @@ function random(from: number, to: number) {
 export class FoodFactory implements IFoodFactory {
   private widthLimit: number;
   private heightLimit: number;
-  private energyLimit: number;
+  private names: string[];
+  private energy: number[];
 
-  constructor(width: number, height: number, energy: number) {
+  constructor(width: number, height: number, foodNames: string[], foodEnergy: number[]) {
     this.widthLimit = width;
     this.heightLimit = height;
-    this.energyLimit = energy;
+    this.energy = foodEnergy;
+    this.names = foodNames;
   }
 
-  public getFood(energy: number): Food {
+  public getFood(): Food {
     const pixel: Pixel = {
       x: random(0, this.widthLimit),
       y: random(0, this.heightLimit),
     };
-    // @TODO: Generated pixel have to be validated, maybe generated position
-    // is not available (on this position can be an obstacle, or the snake)
+    const foodIndex = random(0, this.names.length);
+    // @TODO: Generated pixel have to be validated, its position
+    // may be generated at the same position as an other object position
+    // (on this position can be an obstacle, or the snake)
     return {
-      pixel,
-      energy: energy || random(1, this.energyLimit),
+      name: this.names[foodIndex],
+      energy: this.energy[foodIndex],
+      pixel: pixel,
     };
   }
 }
