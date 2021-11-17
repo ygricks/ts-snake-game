@@ -52,14 +52,16 @@ export interface ISnakeFactory {
 }
 
 export interface VibrationPatterns {
-  eatFood: number[];
+  eatFoodNegative: number[];
+  eatFoodPositive: number[];
   changeDirection: number[];
   gameOver: number[];
 }
 
 export interface IGameVibration {
   toggleSound(): boolean;
-  eatFood(): void;
+  eatFoodPositive(): void;
+  eatFoodNegative(): void;
   changeDirection(): void;
   gameOver(): void;
   setPatterns(patterns: VibrationPatterns): void;

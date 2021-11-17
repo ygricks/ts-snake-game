@@ -14,8 +14,12 @@ export class GameVibration implements IGameVibration {
     }
   }
 
-  eatFood() {
-    this._vibrate(this.patterns.eatFood);
+  eatFoodPositive() {
+    this._vibrate(this.patterns.eatFoodPositive);
+  }
+
+  eatFoodNegative() {
+    this._vibrate(this.patterns.eatFoodNegative);
   }
 
   changeDirection() {
@@ -26,12 +30,16 @@ export class GameVibration implements IGameVibration {
     this._vibrate(this.patterns.gameOver);
   }
 
-  setPatterns(patterns: VibrationPatterns) {
-    this.patterns = patterns;
-  }
-
   toggleSound(): boolean {
     this.hasSound = !this.hasSound;
     return this.hasSound;
+  }
+
+  setPatterns(patterns: Object) {
+    Object.keys(patterns).forEach(key => {
+      if (this.patterns[key]) {
+        this.patterns[key] = patterns[key];
+      }
+    });
   }
 }

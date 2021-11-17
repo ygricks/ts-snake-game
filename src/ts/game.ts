@@ -194,7 +194,11 @@ export class Game {
       }
     }
     if (foodToEat) {
-      this.vibration.eatFood();
+      if (foodToEat.energy < 0) {
+        this.vibration.eatFoodNegative();
+      } else {
+        this.vibration.eatFoodPositive();
+      }
       snake.eatFrom(nextPixel);
       this._score += foodToEat.energy;
       this.trigger('scoreUpdated', this._score);

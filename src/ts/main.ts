@@ -1,17 +1,10 @@
 import { Display } from './display';
 import { FoodFactory, SnakeFactory } from './factories';
 import { Game } from './game';
-import { GameVibration } from './game-vibration';
 import { UserMControler } from './user-m-controler';
-
+import { getGameVibrations } from './vibration-watcher';
 const DISPLAY_HEIGHT = 25;
 const DISPLAY_WIDTH = 25;
-
-const VIBRATION_PATTERN = {
-  eatFood: [100],
-  changeDirection: [50],
-  gameOver: [250, 100, 250],
-};
 
 class GameModal {
   private $window: HTMLElement;
@@ -170,7 +163,7 @@ function createGame($canvas: HTMLCanvasElement) {
     const foodFactory = new FoodFactory(
       DISPLAY_HEIGHT, DISPLAY_WIDTH, foodName, foodEnergy
     );
-    const vibrations = new GameVibration(VIBRATION_PATTERN);
+    const vibrations = getGameVibrations();
     const game = new Game(display, snakeFactory, foodFactory, vibrations, {
       colors: {
         snakeHead: '#1c469d',
