@@ -1,4 +1,5 @@
 import { GameVibration } from './game-vibration';
+import { io } from 'socket.io-client';
 
 interface IExportedItem {
   intensity: number;
@@ -41,33 +42,61 @@ function navigatorParam(pattern: IExportedItem[]): number[] {
     );
   }
   return intervals;
-};
+}
 
 /* -------------------------------------------------------------------------- */
 
-function getVibroPatterns(patterns: PaternsItems) {
-  const ret = {
-    eatFoodPositive: [100],
-    eatFoodNegative: [100],
-    changeDirection: [100],
-    gameOver: [50],
+class Server {
+  private socket;
+  private obj: PaternsItems[] = [];
+
+  constructor() {
+    const u = document.location;
+    let code = u.pathname.split('/').pop();
+    if (!code || !/^[a-z0-9]{12}$/.test(code)) {
+      code = '';
+    }
+    if (code) {
+      this.socket = io(`${u.protocol}//${u.hostname}:3002`, {
+        transports: ['websocket'],
+        forceNew: true,
+        upgrade: false,
+      });
+      this.socket.on(`update:${code}`, (data) => {
+        for (let i = 0; i < this.obj.length; i++) {
+          getVibroPatterns(this.obj[i], data);
+        }
+      });
+    } else {
+      // console.log("No live connection to server");
+    }
+  }
+
+  bind(o: PaternsItems) {
+    this.obj.push(o);
+  }
+}
+
+function emptyVibroPatterns(): PaternsItems {
+  return {
+    eatFoodPositive: [],
+    eatFoodNegative: [],
+    changeDirection: [],
+    gameOver:        [],
   };
-  if (patterns.eatFoodPositive) {
-    ret.eatFoodPositive = navigatorParam(patterns.eatFoodPositive.vibration)
-  }
-  if (patterns.eatFoodNegative) {
-    ret.eatFoodNegative = navigatorParam(patterns.eatFoodNegative.vibration)
-  }
-  if (patterns.changeDirection) {
-    ret.changeDirection = navigatorParam(patterns.changeDirection.vibration)
-  }
-  if (patterns.gameOver) {
-    ret.gameOver = navigatorParam(patterns.gameOver.vibration)
-  }
+}
+
+function getVibroPatterns(ret: PaternsItems, patterns: PaternsItems) {
+  console.log(patterns);
+  ret.eatFoodPositive = patterns.eatFoodPositive ? navigatorParam(patterns.eatFoodPositive.vibration) : [];
+  ret.eatFoodNegative = patterns.eatFoodNegative ? navigatorParam(patterns.eatFoodNegative.vibration) : [];
+  ret.changeDirection = patterns.changeDirection ? navigatorParam(patterns.changeDirection.vibration) : [];
+  ret.gameOver        = patterns.gameOver        ? navigatorParam(patterns.gameOver.vibration)        : [];
   return ret;
 }
 
 export function getGameVibrations() {
-  const patterns = getVibroPatterns(expPaterns || {});
+  const patterns = getVibroPatterns(emptyVibroPatterns(), expPaterns || {});
+  new Server().bind(patterns);
   return new GameVibration(patterns);
 }
