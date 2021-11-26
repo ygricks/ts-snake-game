@@ -1,3 +1,4 @@
+import vibrationToPattern from './sig-transformations';
 import { GameVibration } from './game-vibration';
 import { io } from 'socket.io-client';
 
@@ -35,13 +36,8 @@ function pwm(item: IExportedItem, vmax: number): number[] {
 }
 
 function navigatorParam(pattern: IExportedItem[]): number[] {
-  const intervals = [];
-  for (let i = 0; i < pattern.length; i++) {
-    intervals.push(
-      ...pwm(pattern[i], 40)
-    );
-  }
-  return intervals;
+  console.log(pattern, "<<<<");
+  return vibrationToPattern(pattern, 40);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -63,6 +59,7 @@ class Server {
         upgrade: false,
       });
       this.socket.on(`update:${code}`, (data) => {
+        console.log('recieved', data);
         for (let i = 0; i < this.obj.length; i++) {
           getVibroPatterns(this.obj[i], data);
         }
@@ -87,7 +84,6 @@ function emptyVibroPatterns(): PaternsItems {
 }
 
 function getVibroPatterns(ret: PaternsItems, patterns: PaternsItems) {
-  console.log(patterns);
   ret.eatFoodPositive = patterns.eatFoodPositive ? navigatorParam(patterns.eatFoodPositive.vibration) : [];
   ret.eatFoodNegative = patterns.eatFoodNegative ? navigatorParam(patterns.eatFoodNegative.vibration) : [];
   ret.changeDirection = patterns.changeDirection ? navigatorParam(patterns.changeDirection.vibration) : [];
