@@ -1,14 +1,7 @@
+import { Direction } from "./enum";
 import {
   IDirection, IFood, IDisplay, ISnakeFactory, IFoodFactory, ISnake, IGameVibration, ISettings
 } from "./interfaces";
-
-
-const DIRECTIONS: {[d: string]: IDirection} = {
-  left:   {dx: -1, dy: 0},
-  right:  {dx: 1, dy: 0},
-  top:    {dx: 0, dy: -1},
-  bottom: {dx: 0, dy: 1},
-};
 
 export class Game {
   private display: IDisplay;
@@ -62,7 +55,7 @@ export class Game {
     this._draw();
   }
 
-  public exec(action: string, ...args: any) {
+  public exec(action: string): void {
     if (this.isFinished()) {
       return;
     }
@@ -73,11 +66,16 @@ export class Game {
       case 'pause':
         this.pause();
         break;
-      case 'changeDirection':
-        if (this.isRunning()) {
-          this._requestDirection.push( DIRECTIONS[args[0]] );
-        }
-        break;
+    }
+  }
+
+  public move(edir: Direction): void {
+    if (this.isRunning()) {
+      // transform number in direction
+      const num: number = +edir;
+      const deriv =  num % 2 == 1 ? 1 : -1;
+      const direction = num > 1 ? {dx:0, dy:deriv} : {dx:deriv, dy:0};
+      this._requestDirection.push( direction );
     }
   }
 

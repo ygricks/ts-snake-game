@@ -1,4 +1,5 @@
 import { Display } from './display';
+import { Direction } from './enum';
 import { FoodFactory, SnakeFactory } from './factories';
 import { Game } from './game';
 import { GameVibration } from './game-vibration';
@@ -84,22 +85,22 @@ class App {
       case 'Top':
       case 'ArrowUp':
       case 'KeyW':
-        this.game.exec('changeDirection', 'top');
+        this.game.move(Direction.TOP);
         break;
       case 'Bottom':
       case 'ArrowDown':
       case 'KeyS':
-        this.game.exec('changeDirection', 'bottom');
+        this.game.move(Direction.BOTTOM);
         break;
       case 'Left':
       case 'ArrowLeft':
       case 'KeyA':
-        this.game.exec('changeDirection', 'left');
+        this.game.move(Direction.LEFT);
         break;
       case 'Right':
       case 'ArrowRight':
       case 'KeyD':
-        this.game.exec('changeDirection', 'right');
+        this.game.move(Direction.RIGHT);
         break;
       case 'Space':
         if (this.modal.isOpened()) {
